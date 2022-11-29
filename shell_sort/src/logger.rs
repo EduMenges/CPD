@@ -14,22 +14,9 @@ impl<T, G> Logger<T, G> for NoLogger {
 }
 
 pub struct EachStepLogger<'a, T, G> {
-    gap: &'a G,
-    file: std::fs::File,
-    vec: &'a [T],
-}
-impl<'a, T, G> EachStepLogger<'a, T, G>
-where
-    T: std::fmt::Display,
-    G: std::fmt::Display,
-{
-    pub fn new(file_path: &std::path::Path, vec: &'a [T], gap: &'a G) -> Self {
-        EachStepLogger {
-            gap,
-            file: std::fs::File::create(file_path).unwrap(),
-            vec,
-        }
-    }
+    pub gap: &'a G,
+    pub file: &'a mut std::fs::File,
+    pub vec: &'a [T],
 }
 impl<T, G> Logger<T, G> for EachStepLogger<'_, T, G>
 where
