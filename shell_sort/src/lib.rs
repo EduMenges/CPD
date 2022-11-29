@@ -1,24 +1,20 @@
 pub mod gaps;
+pub mod logger;
 
-use std::{fmt::{Debug}, fs::File, io::Write};
+use std::fmt::Debug;
 
 use gaps::*;
+use logger::*;
 
-pub fn shell_sort<T, G>(vec: &mut Vec<T>, display_steps: bool, log_file: &mut File)
+pub fn shell_sort<T, G, L: Logger<T, G>>(vec: &mut Vec<T>, mut logger: L)
 where
     T: std::cmp::PartialOrd<T> + Debug + std::fmt::Display,
     G: NewCounter<G> + std::fmt::Display + Iterator<Item = usize>,
 {
-    let mut log_buffer: String;
-
     if vec.len() > 1 {
         let gaps = G::new(vec.len());
 
-        if display_steps {
-            log_buffer = format!("{}SEQ={}", vec.iter().fold(String::new(), |acc, num| acc + &num.to_string() + ", "), gaps);
-            writeln!(log_file, "{}", log_buffer).unwrap();
-            println!("{}", log_buffer);
-        }
+        logger.log_start();
 
         for gap in gaps {
             for mut key in gap..vec.len() {
@@ -27,11 +23,9 @@ where
                     key -= gap;
                 }
             }
-            if display_steps {
-                log_buffer = format!("{}INCR={gap}", vec.iter().fold(String::new(), |acc, num| acc + &num.to_string() + ", "));
-                writeln!(log_file, "{}", log_buffer).unwrap();
-                println!("{}", log_buffer);
-            }
+            logger.log_step(gap);
         }
+
+        logger.log_end();
     }
 }
