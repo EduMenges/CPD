@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 quick_sort = { path = "..\\quick_sort" }
+file_parser = { path = "..\\file_parser" }

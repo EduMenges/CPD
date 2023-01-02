@@ -15,7 +15,7 @@ pub fn file_parser(path_: &std::path::Path) -> LinkedList<Vec<u32>> {
     ret
 }
 
-fn line_parser(line: &str) -> Vec<u32> {
+pub fn line_parser(line: &str) -> Vec<u32> {
     let string_and_n = line.split_once(' ');
 
     if let Some((element_amount, line)) = string_and_n {
@@ -30,20 +30,5 @@ fn line_parser(line: &str) -> Vec<u32> {
         ret
     } else {
         Vec::new()
-    }
-}
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
     }
 }
