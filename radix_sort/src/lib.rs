@@ -18,7 +18,7 @@ impl Default for MsdSort {
 
 impl MsdSort {
     pub fn sort(&mut self, src: &mut [String]) {
-        self.aux = Vec::with_capacity(src.len());
+        self.aux = vec![String::default(); src.len()];
         self.sort_(src, 0, src.len() - 1, 0);
     }
 
@@ -37,15 +37,15 @@ impl MsdSort {
         }
 
         // Transform the counts to indices
-        for r in 1..count.len() {
-            count[r] += count[r - 1];
+        for r in 0..self.radix + 1 {
+            count[r + 1] += count[r];
         }
 
         // Distribute
         for i in lo..=hi {
             let index = char_at(&src[i], pos) as usize + 1;
             count[index] += 1;
-            self.aux[index] = std::mem::replace(&mut src[i], String::default());
+            self.aux[count[index]] = std::mem::replace(&mut src[i], String::default());
         }
 
         // Copy back
