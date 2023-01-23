@@ -23,17 +23,17 @@ impl MsdSort {
     }
 
     fn sort_(&mut self, src: &mut [String], lo: usize, hi: usize, pos: usize) {
-        if hi <= lo + self.cutoff {
-            src.sort();
-            return;
-        }
+        // if hi <= lo + self.cutoff {
+        //     src.sort();
+        //     return;
+        // }
 
-        let mut count: Vec<usize> = Vec::with_capacity(self.radix + 2);
-        let char_at = |word: &str, n: usize| -> Option<char> { word.chars().nth(n) };
+        let mut count: Vec<usize> = vec![0; self.radix + 2];
+        let char_at = |word: &str, n: usize| word.chars().nth(n).unwrap();
 
         // Computes the frequency count
         for i in lo..=hi {
-            count[char_at(&src[i], pos + 2).unwrap() as usize] += 1;
+            count[char_at(&src[i], pos) as usize + 2] += 1;
         }
 
         // Transform the counts to indices
@@ -43,7 +43,7 @@ impl MsdSort {
 
         // Distribute
         for i in lo..=hi {
-            let index = char_at(&src[i], pos).unwrap() as usize + 1;
+            let index = char_at(&src[i], pos) as usize + 1;
             count[index] += 1;
             self.aux[index] = std::mem::replace(&mut src[i], String::default());
         }
