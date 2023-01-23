@@ -1,12 +1,12 @@
 mod the_algos;
 
-struct msd_sort {
+struct MsdSort {
     radix: usize,
     cutoff: usize,
     aux: Vec<String>,
 }
 
-impl Default for msd_sort {
+impl Default for MsdSort {
     fn default() -> Self {
         Self {
             radix: 256,
@@ -16,7 +16,7 @@ impl Default for msd_sort {
     }
 }
 
-impl msd_sort {
+impl MsdSort {
     pub fn sort(&mut self, src: &mut [String]) {
         self.aux = Vec::with_capacity(src.len());
         self.sort_(src, 0, src.len() - 1, 0);
@@ -60,6 +60,6 @@ impl msd_sort {
 }
 
 pub fn radix_sort(src: &mut [String]) {
-    let mut msd_struct = msd_sort::default();
+    let mut msd_struct = MsdSort::default();
     msd_struct.sort(src);
 }
