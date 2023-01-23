@@ -9,9 +9,14 @@ fn main() {
         "fee".to_string(),
         "bad".to_string(),
         "dad".to_string(),
+        "bee".to_string(),
+        "fed".to_string(),
+        "bed".to_string(),
+        "ebb".to_string(),
+        "ace".to_string(),
     ];
 
     radix_sort(&mut test);
 
-    println!("Hello, world!");
+    println!("{:?}", test);
 }

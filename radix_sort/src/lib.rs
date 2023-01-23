@@ -24,7 +24,8 @@ impl MsdSort {
 
     fn sort_(&mut self, src: &mut [String], lo: usize, hi: usize, pos: usize) {
         if hi <= lo + self.cutoff {
-            src[lo..hi].sort();
+            src.sort();
+            return;
         }
 
         let mut count: Vec<usize> = Vec::with_capacity(self.radix + 2);
