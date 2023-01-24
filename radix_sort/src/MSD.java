@@ -51,12 +51,12 @@ public class MSD {
     /**
      * Rearranges the array of extended ASCII strings in ascending order.
      *
-     * @param a the array to be sorted
+     * @param src the array to be sorted
      */
-    public static void sort(String[] a) {
-        int n = a.length;
+    public static void sort(String[] src) {
+        int n = src.length;
         String[] aux = new String[n];
-        sort(a, 0, n - 1, 0, aux);
+        sort(src, 0, n - 1, 0, aux);
     }
 
     // return dth character of s, -1 if d = length of string
@@ -68,18 +68,18 @@ public class MSD {
     }
 
     // sort from a[lo] to a[hi], starting at the dth character
-    private static void sort(String[] a, int lo, int hi, int d, String[] aux) {
+    private static void sort(String[] src, int lo, int hi, int pos, String[] aux) {
 
         // cutoff to insertion sort for small subarrays
         if (hi <= lo + CUTOFF) {
-            insertion(a, lo, hi, d);
+            insertion(src, lo, hi, pos);
             return;
         }
 
         // compute frequency counts
         int[] count = new int[R + 2];
         for (int i = lo; i <= hi; i++) {
-            int c = charAt(a[i], d);
+            int c = charAt(src[i], pos);
             count[c + 2]++;
         }
 
@@ -89,17 +89,17 @@ public class MSD {
 
         // distribute
         for (int i = lo; i <= hi; i++) {
-            int c = charAt(a[i], d);
-            aux[count[c + 1]++] = a[i];
+            int c = charAt(src[i], pos);
+            aux[count[c + 1]++] = src[i];
         }
 
         // copy back
         for (int i = lo; i <= hi; i++)
-            a[i] = aux[i - lo];
+            src[i] = aux[i - lo];
 
         // recursively sort for each character (excludes sentinel -1)
         for (int r = 0; r < R; r++)
-            sort(a, lo + count[r], lo + count[r + 1] - 1, d + 1, aux);
+            sort(src, lo + count[r], lo + count[r + 1] - 1, pos + 1, aux);
     }
 
     // insertion sort a[lo..hi], starting at dth character
