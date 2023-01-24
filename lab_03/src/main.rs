@@ -22,8 +22,10 @@ fn main() {
     for line in io::stdin().lines() {
         match line {
             Ok(line) => {
-                if line.len() >= 4 {
-                    str_vec.push(line);
+                for word in line.split(' ') {
+                    if word.len() >= 4 {
+                        str_vec.push(word.to_owned());
+                    }
                 }
             }
             Err(err) => println!("{err}"),
