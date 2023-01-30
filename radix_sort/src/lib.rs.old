@@ -1,0 +1,79 @@
+struct MsdSort {
+    radix: usize,
+    cutoff: usize,
+    aux: Vec<String>,
+}
+
+impl Default for MsdSort {
+    fn default() -> Self {
+        Self {
+            radix: 256,
+            cutoff: 2,
+            aux: Default::default(),
+        }
+    }
+}
+
+impl MsdSort {
+    pub fn sort(&mut self, src: &mut [String]) {
+        self.aux = vec![String::default(); src.len()];
+        self.sort_(src, 0, src.len() as isize - 1, 0);
+    }
+
+    pub fn char_at(word: &str, n: usize) -> isize {
+        match word.chars().nth(n) {
+            Some(ch) => ch as isize,
+            None => -1_isize,
+        }
+    }
+
+    fn sort_(&mut self, src: &mut [String], lo: usize, hi: isize, pos: usize) {
+        if hi <= (lo + self.cutoff) as isize {
+            src.sort();
+            return;
+        }
+
+        let mut count: Vec<usize> = vec![0; self.radix + 2];
+
+        // Computes the frequency count
+        for i in lo..=hi as usize {
+            count[Self::char_at(&src[i], pos) as usize + 2] += 1;
+        }
+
+        let mut acumulation: Vec<usize> = vec![0; self.radix + 2];
+
+        // Transform the counts to indices
+        for r in 0..self.radix + 1 {
+            acumulation[r + 1] += count[r];
+        }
+
+        // Distribute
+        for i in lo..=hi as usize {
+            let index = Self::char_at(&src[i], pos) as usize + 1;
+            self.aux[acumulation[index]] = std::mem::replace(&mut src[i], String::default());
+            acumulation[index] += 1;
+        }
+
+        // Copy back
+        for i in lo..=hi as usize {
+            src[i] = std::mem::replace(&mut self.aux[i - lo], String::default());
+        }
+
+        // Makes the final recursion call
+        for r in 0..self.radix {
+            if count[r] != 0 {
+                self.sort_(
+                    src,
+                    lo + acumulation[r],
+                    (lo + acumulation[r + 1]) as isize - 1,
+                    pos + 1,
+                );
+            }
+        }
+    }
+}
+
+pub fn radix_sort(src: &mut [String]) {
+    let mut msd_struct = MsdSort::default();
+    msd_struct.sort(src);
+}
