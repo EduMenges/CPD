@@ -15,15 +15,15 @@ impl Default for MSD {
 }
 
 impl MSD {
-    pub fn char_at(src: &str, pos: usize) -> usize {
+    pub fn char_at(src: &str, pos: usize) -> isize {
         match src.chars().nth(pos) {
-            Some(ch) => ch as usize,
-            None => 0,
+            Some(ch) => ch as isize,
+            None => -1,
         }
     }
 
     pub fn sort(&mut self, src: &mut [String]) {
-        self.aux = Vec::with_capacity(src.len());
+        self.aux = vec![String::default(); src.len()];
         self.sort_(src, 0);
     }
 
@@ -35,25 +35,24 @@ impl MSD {
         }
 
         // Compute the frequency counts
-        let mut count = vec![0; self.radix];
+        let mut count = vec![0; self.radix + 2];
         for element in src.as_ref() {
             let index = Self::char_at(element, pos);
-            count[index] += 1;
+            count[(index + 2) as usize] += 1;
         }
 
         // Perform the accumulation
-        let mut accumulation = vec![0; self.radix];
-        for i in 1..accumulation.len() {
-            accumulation[i] += accumulation[i - 1];
+        for r in 0..=self.radix {
+            count[r + 1] += count[r];
         }
 
         // Move to the aux, sorted
-        for i in (0..src.len()).rev() {
+        for i in 0..src.len() {
             let ch = Self::char_at(&src[i], pos);
-            accumulation[ch] -= 1;
-            let new_i = accumulation[ch];
+            let new_i = (ch + 1) as usize;
 
-            std::mem::swap(&mut src[i], &mut self.aux[new_i]);
+            std::mem::swap(&mut src[i], &mut self.aux[count[new_i]]);
+            count[new_i] += 1;
         }
 
         // Move back to the src
@@ -62,8 +61,15 @@ impl MSD {
         }
 
         // Recursively sort for the rest of characters
-        for i in 1..self.radix {
-            Self::sort_(&mut self, src, pos + 1);
+        for r in 1..self.radix {
+            let radix_i = count[r];
+            let next_radix = count[r + 1];
+            Self::sort_(self, &mut src[radix_i..next_radix], pos + 1);
         }
     }
+}
+
+pub fn radix_sort(src: &mut [String]) {
+    let mut msd = MSD::default();
+    msd.sort(src);
 }
