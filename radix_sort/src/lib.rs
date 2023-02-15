@@ -28,9 +28,12 @@ impl MsdSort {
             return;
         }
 
+        let char_at = |word: &str, n: usize| {match word.chars().nth(n) {
+            Some(ch) => ch as isize,
+            None => -1,
+        }};
+        
         let mut count: Vec<usize> = vec![0; self.radix + 2];
-        let char_at = |word: &str, n: usize| word.chars().nth(n).unwrap();
-
         // Computes the frequency count
         for i in lo..=hi as usize {
             count[char_at(&src[i], pos) as usize + 2] += 1;
@@ -44,13 +47,13 @@ impl MsdSort {
         // Distribute
         for i in lo..=hi as usize {
             let index = char_at(&src[i], pos) as usize + 1;
-            self.aux[count[index]] = std::mem::replace(&mut src[i], String::default());
+            self.aux[count[index]] = std::mem::take(&mut src[i]);
             count[index] += 1;
         }
 
         // Copy back
         for i in lo..=hi as usize {
-            src[i] = std::mem::replace(&mut self.aux[i - lo], String::default());
+            src[i] = std::mem::take(&mut self.aux[i - lo]);
         }
 
         // Makes the final recursion call
