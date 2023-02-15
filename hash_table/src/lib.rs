@@ -1,5 +1,7 @@
 
-static const P = 123;
+use std::collections::LinkedList;
+
+const P: u8 = 123;
 
 pub struct HashTable {
     table: Vec<LinkedList<String>>,
@@ -7,7 +9,7 @@ pub struct HashTable {
 
 impl HashTable {
     pub new(entries: usize) -> Self {
-        table: Vec::with_capacity(entries),
+        Self {table: Vec::with_capacity(entries),}
     }
 
     pub insert(&mut self, string: String) {
@@ -26,7 +28,7 @@ impl HashTable {
         let m = self.table.len();
                 let mut hash = 0_size;
 
-        for ch in string.chars().rev() {
+        for ch in string.chars() {
             hash = (ch as usize) % m + (P * hash) % m;
         }
 
