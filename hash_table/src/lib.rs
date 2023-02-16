@@ -50,13 +50,17 @@ impl HashTable {
         let list = &self.table[hashed];
         let mut res = 1;
         let mut it = list.iter();
+        let mut found = false;
 
-        while let Some(element) = it.next() && *element != string {
+        while !found && let Some(element) = it.next() {
             res += 1;
+            if *element == string {
+                found = true;
+            }
         }
 
-        if it.is_empty() {
-            res = 0;
+        if !found {
+            res = -1;
         }
 
         res
@@ -102,11 +106,29 @@ impl HashTable {
         }
     }
 
+    pub fn test_slice(&self, slice: &[String]) {
+        for string in slice {
+            self.test_search(&string);
+        }
+    }
+
+    fn test_search(&self, string: &str) {
+        let result = self.search(string);
+
+        let display = if result < 0 {
+            format!("MISS")
+        } else {
+            format!("HIT {}", result)
+        };
+
+        println!("{string} {display}");
+    }
+
     fn hash(&self, string: &str) -> usize {
         let m = self.table.len();
         let mut hash = 0_usize;
 
-        for ch in string.chars() {
+        for ch in string.bytes() {
             hash = ((ch as usize) % m + (P * hash) % m) % m;
         }
 

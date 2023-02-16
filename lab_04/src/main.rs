@@ -6,7 +6,7 @@ use std::{
 
 use hash_table::HashTable;
 
-const ENTRIES: usize = 503;
+const ENTRIES: usize = 7507;
 
 fn main() -> io::Result<()> {
     let nomes_p = Path::new(".\\nomes_10000.txt");
@@ -17,11 +17,13 @@ fn main() -> io::Result<()> {
         nomes_ht.insert(s?);
     }
 
-    let consultas = Path::new(".\\consultas.txt");
-    let mut consultas = parse_file(consultas)?;
+    let consultas_p = Path::new(".\\consultas.txt");
+    let consultas = parse_file(consultas_p)?;
 
+    println!("PARTE1: ESTATISTICAS DA TABELA HASH");
     println!("{}", nomes_ht.get_list_statistics());
-
+    println!("\nPARTE 2: ESTATISTICAS DAS CONSULTAS");
+    nomes_ht.test_slice(&consultas);
     Ok(())
 }
 
