@@ -1,16 +1,10 @@
-use std::{collections::LinkedList, fmt::Display};
-
-pub trait MyHash {
-    fn hash(&self) -> usize;
+pub struct HashMap<K, V> {
+    table: Vec<LinkedList<(K, V)>>,
 }
 
-pub struct HashTable<V> {
-    table: Vec<LinkedList<V>>,
-}
-
-impl<V> HashTable<V>
+impl<K, V> HashMap<K, V>
 where
-    V: MyHash + Clone + PartialEq,
+    K: MyHash,
 {
     pub fn new(entries: usize) -> Self {
         Self {
