@@ -1,8 +1,6 @@
 use std::{collections::LinkedList, fmt::Display};
 
-pub trait MyHash {
-    fn hash(&self) -> usize;
-}
+use crate::hash::MyHash;
 
 pub struct HashTable<V> {
     table: Vec<LinkedList<V>>,
@@ -10,19 +8,26 @@ pub struct HashTable<V> {
 
 impl<V> HashTable<V>
 where
-    V: MyHash + Clone + PartialEq,
+    V: MyHash + PartialEq,
 {
     pub fn new(entries: usize) -> Self {
-        Self {
-            table: vec![LinkedList::new(); entries],
+        let mut table = Vec::new();
+
+        for _ in 0..entries {
+            table.push(LinkedList::new())
         }
+
+        Self { table }
     }
 
     pub fn insert(&mut self, entry: V) {
         let hashed = entry.hash();
-        self.table[hashed].push_back(entry);
+        if !self.contains(&entry) {
+            self.table[hashed].push_back(entry);
+        }
     }
 
+    #[inline]
     pub fn contains(&self, entry: &V) -> bool {
         let hashed = entry.hash();
         self.table[hashed].contains(entry)
