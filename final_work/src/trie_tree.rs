@@ -1,7 +1,8 @@
+/// This amount is enough to represent all [a-z][A-Z] letters.
 const AMOUNT_OF_LETTERS: usize = 57;
 
 struct TrieNode {
-    children: [Option<Box<TrieNode>>; AMOUNT_OF_LETTERS], // 26 for English alphabets
+    children: [Option<Box<TrieNode>>; AMOUNT_OF_LETTERS],
     is_end_of_word: bool,
 }
 
