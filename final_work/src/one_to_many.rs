@@ -15,19 +15,23 @@ where
     }
 
     pub fn insert(&mut self, entry: (K, V)) {
-        match self.get(&entry.0) {
+        match self.get_mut(&entry.0) {
             Some(collection) => collection.push(entry.1),
             None => self.map.insert((entry.0, vec![entry.1])),
         }
     }
 
-    #[inline]
-    fn get(&mut self, key: &K) -> Option<&mut Vec<V>> {
+    pub fn get(&self, key: &K) -> Option<&Vec<V>> {
         self.map.get(key)
     }
 
+    #[inline]
+    fn get_mut(&mut self, key: &K) -> Option<&mut Vec<V>> {
+        self.map.get_mut(key)
+    }
+
     pub fn update(&mut self, key: &K, value: V) {
-        if let Some(vec) = self.get(key) {
+        if let Some(vec) = self.get_mut(key) {
             vec.push(value)
         }
     }
@@ -45,5 +49,8 @@ mod tests {
         otm.insert((common_key.clone(), 1));
         otm.update(&common_key, 2);
         otm.update(&common_key, 3);
+
+        let expected = vec![1, 2, 3];
+        assert_eq!(otm.get(&common_key).unwrap(), &expected);
     }
 }

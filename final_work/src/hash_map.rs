@@ -30,7 +30,16 @@ where
         }
     }
 
-    pub fn get(&mut self, key: &K) -> Option<&mut V> {
+    pub fn get(&self, key: &K) -> Option<&V> {
+        let hashed = self.do_hash(key);
+
+        self.table[hashed]
+            .iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, v)| v)
+    }
+
+    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
         let hashed = self.do_hash(key);
 
         self.table[hashed]
@@ -52,7 +61,7 @@ where
 
     #[inline]
     fn update_entry(&mut self, hash: usize, entry: (K, V)) {
-        *self.get(&entry.0).unwrap() = entry.1;
+        *self.get_mut(&entry.0).unwrap() = entry.1;
     }
 
     pub fn iter(&self) -> Iter<'_, K, V> {
@@ -97,7 +106,7 @@ mod tests {
     fn get() {
         let mut map = HashMap::new(10);
         map.insert((1, "Um"));
-        let reference = map.get(&1).unwrap();
+        let reference = map.get_mut(&1).unwrap();
 
         assert_eq!(*reference, "Um");
     }
@@ -107,7 +116,7 @@ mod tests {
         let mut map = HashMap::new(10);
         map.insert((1, "Um"));
         map.insert((1, "Uno"));
-        let reference = map.get(&1).unwrap();
+        let reference = map.get_mut(&1).unwrap();
 
         assert_eq!(*reference, "Uno");
     }
