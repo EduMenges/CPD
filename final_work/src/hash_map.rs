@@ -1,5 +1,6 @@
 use crate::hash::MyHash;
-use std::collections::LinkedList;
+use core::slice;
+use std::collections::{linked_list, LinkedList};
 
 pub struct HashMap<K, V> {
     table: Vec<LinkedList<(K, V)>>,
@@ -52,6 +53,39 @@ where
     #[inline]
     fn update_entry(&mut self, hash: usize, entry: (K, V)) {
         *self.get(&entry.0).unwrap() = entry.1;
+    }
+
+    pub fn iter(&self) -> Iter<'_, K, V> {
+        let vec_i = self.table.iter();
+        let list_i = self.table[0].iter();
+
+        Iter { vec_i, list_i }
+    }
+}
+
+pub struct Iter<'a, K: 'a, V: 'a> {
+    vec_i: slice::Iter<'a, LinkedList<(K, V)>>,
+    list_i: linked_list::Iter<'a, (K, V)>,
+}
+
+impl<'a, K, V> Iterator for Iter<'a, K, V> {
+    type Item = &'a (K, V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(entry) = self.list_i.next() {
+            Some(entry)
+        } else {
+            loop {
+                let next_row = self.vec_i.next()?;
+
+                if !next_row.is_empty() {
+                    self.list_i = next_row.iter();
+                    break;
+                }
+            }
+
+            self.list_i.next()
+        }
     }
 }
 

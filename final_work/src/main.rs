@@ -1,6 +1,8 @@
 #![feature(let_chains)]
 #![feature(exact_size_is_empty)]
 
+use std::collections::LinkedList;
+
 mod hash;
 mod hash_map;
 mod hash_table;
