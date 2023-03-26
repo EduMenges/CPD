@@ -3,6 +3,9 @@
 
 use std::collections::LinkedList;
 
+use app::DataBase;
+
+mod app;
 mod hash;
 mod hash_map;
 mod hash_table;
@@ -11,5 +14,5 @@ mod one_to_many;
 mod trie_tree;
 
 fn main() {
-    println!("Hello, world!");
+    let db = DataBase::new();
 }
