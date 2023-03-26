@@ -20,7 +20,7 @@ where
     }
 
     pub fn insert(&mut self, entry: (K, V)) {
-        let hashed = entry.0.hash();
+        let hashed = self.do_hash(&entry.0);
 
         if !self.contains(&entry.0) {
             self.table[hashed].push_back(entry);
@@ -30,7 +30,8 @@ where
     }
 
     pub fn get(&mut self, key: &K) -> Option<&mut V> {
-        let hashed = key.hash();
+        let hashed = self.do_hash(key);
+
         self.table[hashed]
             .iter_mut()
             .find(|(k, _)| k == key)
@@ -38,13 +39,42 @@ where
     }
 
     #[inline]
+    fn do_hash(&self, key: &K) -> usize {
+        key.hash() % self.table.capacity()
+    }
+
+    #[inline]
     pub fn contains(&self, key: &K) -> bool {
-        let hashed = key.hash();
+        let hashed = self.do_hash(key);
         self.table[hashed].iter().any(|(k, _)| k == key)
     }
 
     #[inline]
     fn update_entry(&mut self, hash: usize, entry: (K, V)) {
         *self.get(&entry.0).unwrap() = entry.1;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::HashMap;
+
+    #[test]
+    fn get() {
+        let mut map = HashMap::new(10);
+        map.insert((1, "Um"));
+        let reference = map.get(&1).unwrap();
+
+        assert_eq!(*reference, "Um");
+    }
+
+    #[test]
+    fn double_insert() {
+        let mut map = HashMap::new(10);
+        map.insert((1, "Um"));
+        map.insert((1, "Uno"));
+        let reference = map.get(&1).unwrap();
+
+        assert_eq!(*reference, "Uno");
     }
 }
