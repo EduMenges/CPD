@@ -15,9 +15,20 @@ where
     }
 
     pub fn insert(&mut self, entry: (K, V)) {
-        match self.map.get(&entry.0) {
+        match self.get(&entry.0) {
             Some(collection) => collection.push(entry.1),
             None => self.map.insert((entry.0, vec![entry.1])),
+        }
+    }
+
+    #[inline]
+    fn get(&mut self, key: &K) -> Option<&mut Vec<V>> {
+        self.map.get(key)
+    }
+
+    pub fn update(&mut self, key: &K, value: V) {
+        if let Some(vec) = self.get(key) {
+            vec.push(value)
         }
     }
 }
@@ -27,8 +38,12 @@ mod tests {
     use super::OneToMany;
 
     #[test]
-    fn insertion() {
+    fn all() {
+        let common_key = String::from("Números");
+
         let mut otm = OneToMany::new(10);
-        otm.insert((String::from("Números"), 1));
+        otm.insert((common_key.clone(), 1));
+        otm.update(&common_key, 2);
+        otm.update(&common_key, 3);
     }
 }
