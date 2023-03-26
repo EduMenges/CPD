@@ -2,7 +2,7 @@ pub trait MyHash {
     fn hash(&self) -> usize;
 }
 
-impl MyHash for &str {
+impl MyHash for str {
     fn hash(&self) -> usize {
         let mut hash: usize = 5381;
 
@@ -11,6 +11,13 @@ impl MyHash for &str {
         }
 
         hash
+    }
+}
+
+impl MyHash for String {
+    #[inline]
+    fn hash(&self) -> usize {
+        self.as_str().hash()
     }
 }
 

@@ -21,3 +21,14 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::OneToMany;
+
+    #[test]
+    fn insertion() {
+        let mut otm = OneToMany::new(10);
+        otm.insert((String::from("Números"), 1));
+    }
+}
