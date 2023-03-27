@@ -79,7 +79,7 @@ pub fn load_tags(base_path: PathBuf) -> OneToMany<String, u32> {
     tags
 }
 
-pub fn load_players(base_path: PathBuf, ratings: &HashMap<u32, Rating>) -> HashMap<u32, Player> {
+pub fn load_players(base_path: PathBuf, ratings: &OneToMany<u32, Rating>) -> HashMap<u32, Player> {
     let path = base_path.join("players.csv");
 
     let mut players = HashMap::new(15000);
@@ -91,13 +91,15 @@ pub fn load_players(base_path: PathBuf, ratings: &HashMap<u32, Rating>) -> HashM
     {
         let fifa_id = entry.0;
         let player = Player {
-            name: todo!(),
-            player_positions: todo!(),
-            rating: todo!(),
-            count: todo!(),
+            name: entry.1,
+            player_positions: entry.2,
+            rating: 0.0,
+            count: 0,
         };
         players.insert((fifa_id, player));
     }
+
+    ratings.compute_ratings(&mut players);
 
     players
 }

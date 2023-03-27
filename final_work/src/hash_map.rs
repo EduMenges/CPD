@@ -66,15 +66,15 @@ where
     }
 
     pub fn iter(&self) -> Iter<'_, K, V> {
-        let vec_i = self.table.iter();
-        let list_i = self.table[0].iter();
+        let mut vec_i = self.table.iter();
+        let list_i = vec_i.next().unwrap().iter();
 
         Iter { vec_i, list_i }
     }
 
     pub fn iter_mut(&mut self) -> IterMut<'_, K, V> {
-        let vec_i = self.table.iter_mut();
-        let list_i = ;
+        let mut vec_i = self.table.iter_mut();
+        let list_i = vec_i.next().unwrap().iter_mut();
 
         IterMut { vec_i, list_i }
     }
