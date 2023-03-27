@@ -21,7 +21,7 @@ impl OneToMany<u32, Rating> {
             }
         }
 
-        for (_, player) in players.iter_mut() {
+        for (_, player) in players.iter_mut().filter(|(_, player)| player.count != 0) {
             player.rating /= player.count as f64;
         }
     }
