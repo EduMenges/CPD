@@ -9,10 +9,19 @@ struct TrieNode<'a, T> {
 }
 
 impl<'a, T> TrieNode<'a, T> {
-    fn new(member: Option<&'a T>) -> Self {
+    pub fn new(member: Option<&'a T>) -> Self {
         Self {
             children: array_init(|_| None),
             member,
+        }
+    }
+
+    pub fn dfs(&self, buffer: &mut Vec<&'a T>) {
+        for node in self.children.iter().filter_map(|child| child.as_ref()) {
+            if let Some(member) = node.member {
+                buffer.push(member)
+            }
+            node.dfs(buffer);
         }
     }
 }
@@ -63,13 +72,15 @@ impl<'a, T> Trie<'a, T> {
         Some(node)
     }
 
-    pub rec_search(&self, word &str) -> Vec<&'a T> {
-        let ret = Vec::new();
+    pub fn search_all(&self, word: &str) -> Vec<&'a T> {
+        let mut ret = Vec::new();
 
-        base_node = self.search_node(word);
-        match base_node {
-            
+        let base_node = self.search_node(word);
+        if let Some(node) = base_node {
+            node.dfs(&mut ret);
         }
+
+        ret
     }
 
     pub fn starts_with(&self, prefix: &str) -> bool {

@@ -49,7 +49,7 @@ where
             .map(|(_, v)| v)
     }
 
-    #[inline]
+    #[inline(always)]
     fn do_hash(&self, key: &K) -> usize {
         key.hash() % self.table.capacity()
     }
@@ -60,7 +60,7 @@ where
         self.table[hashed].iter().any(|(k, _)| k == key)
     }
 
-    #[inline]
+    #[inline(always)]
     fn update_entry(&mut self, hash: usize, entry: (K, V)) {
         *self.get_mut(&entry.0).unwrap() = entry.1;
     }

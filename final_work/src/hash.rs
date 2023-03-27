@@ -15,7 +15,7 @@ impl MyHash for str {
 }
 
 impl MyHash for String {
-    #[inline]
+    #[inline(always)]
     fn hash(&self) -> usize {
         self.as_str().hash()
     }

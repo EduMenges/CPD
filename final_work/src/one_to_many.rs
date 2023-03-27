@@ -29,7 +29,7 @@ where
         self.map.get(key)
     }
 
-    #[inline]
+    #[inline(always)]
     fn get_mut(&mut self, key: &K) -> Option<&mut Vec<V>> {
         self.map.get_mut(key)
     }
@@ -40,7 +40,7 @@ where
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn iter(&self) -> Iter<'_, K, Vec<V>> {
         Iter {
             map_i: self.map.iter(),
@@ -55,7 +55,7 @@ pub struct Iter<'a, K, V> {
 impl<'a, K, V> Iterator for Iter<'a, K, V> {
     type Item = &'a (K, V);
 
-    #[inline]
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         self.map_i.next()
     }
