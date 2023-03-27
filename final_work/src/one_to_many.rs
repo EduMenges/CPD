@@ -1,5 +1,9 @@
-use crate::{hash::MyHash, hash_map::HashMap};
+use crate::{
+    hash::MyHash,
+    hash_map::{self, HashMap},
+};
 
+#[derive(Debug)]
 pub struct OneToMany<K, V> {
     map: HashMap<K, Vec<V>>,
 }
@@ -34,6 +38,26 @@ where
         if let Some(vec) = self.get_mut(key) {
             vec.push(value)
         }
+    }
+
+    #[inline]
+    pub fn iter(&self) -> Iter<'_, K, Vec<V>> {
+        Iter {
+            map_i: self.map.iter(),
+        }
+    }
+}
+
+pub struct Iter<'a, K, V> {
+    map_i: hash_map::Iter<'a, K, V>,
+}
+
+impl<'a, K, V> Iterator for Iter<'a, K, V> {
+    type Item = &'a (K, V);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        self.map_i.next()
     }
 }
 

@@ -15,4 +15,6 @@ mod trie_tree;
 
 fn main() {
     let db = DataBase::new();
+    // db.print_ratings();
+    db.print_tags();
 }

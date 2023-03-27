@@ -2,6 +2,7 @@ use crate::hash::MyHash;
 use core::slice;
 use std::collections::{linked_list, LinkedList};
 
+#[derive(Debug)]
 pub struct HashMap<K, V> {
     table: Vec<LinkedList<(K, V)>>,
 }
@@ -10,10 +11,10 @@ impl<K, V> HashMap<K, V>
 where
     K: MyHash + std::cmp::PartialEq,
 {
-    pub fn new(entries: usize) -> Self {
-        let mut table = Vec::new();
+    pub fn new(capacity: usize) -> Self {
+        let mut table = Vec::with_capacity(capacity);
 
-        for _ in 0..entries {
+        for _ in 0..capacity {
             table.push(LinkedList::new())
         }
 
@@ -70,6 +71,13 @@ where
 
         Iter { vec_i, list_i }
     }
+
+    pub fn iter_mut(&mut self) -> IterMut<'_, K, V> {
+        let vec_i = self.table.iter_mut();
+        let list_i = ;
+
+        IterMut { vec_i, list_i }
+    }
 }
 
 pub struct Iter<'a, K: 'a, V: 'a> {
@@ -89,6 +97,32 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
 
                 if !next_row.is_empty() {
                     self.list_i = next_row.iter();
+                    break;
+                }
+            }
+
+            self.list_i.next()
+        }
+    }
+}
+
+pub struct IterMut<'a, K: 'a, V: 'a> {
+    vec_i: slice::IterMut<'a, LinkedList<(K, V)>>,
+    list_i: linked_list::IterMut<'a, (K, V)>,
+}
+
+impl<'a, K, V> Iterator for IterMut<'a, K, V> {
+    type Item = &'a mut (K, V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(entry) = self.list_i.next() {
+            Some(entry)
+        } else {
+            loop {
+                let next_row = self.vec_i.next()?;
+
+                if !next_row.is_empty() {
+                    self.list_i = next_row.iter_mut();
                     break;
                 }
             }
