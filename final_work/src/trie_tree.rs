@@ -1,60 +1,78 @@
+use array_init::array_init;
+
 /// This amount is enough to represent all [a-z][A-Z] letters.
 const AMOUNT_OF_LETTERS: usize = 57;
 
-struct TrieNode {
-    children: [Option<Box<TrieNode>>; AMOUNT_OF_LETTERS],
-    is_end_of_word: bool,
+struct TrieNode<'a, T> {
+    children: [Option<Box<TrieNode<'a, T>>>; AMOUNT_OF_LETTERS],
+    member: Option<&'a T>,
 }
 
-impl TrieNode {
-    fn new() -> Self {
-        const CHILDREN_INIT: Option<Box<TrieNode>> = None;
+impl<'a, T> TrieNode<'a, T> {
+    fn new(member: Option<&'a T>) -> Self {
         Self {
-            children: [CHILDREN_INIT; AMOUNT_OF_LETTERS],
-            is_end_of_word: false,
+            children: array_init(|_| None),
+            member,
         }
     }
 }
 
-pub struct Trie {
-    root: TrieNode,
+pub struct Trie<'a, T> {
+    root: TrieNode<'a, T>,
 }
 
-impl Trie {
+impl<'a, T> Trie<'a, T> {
     pub fn new() -> Self {
         Self {
-            root: TrieNode::new(),
+            root: TrieNode::new(None),
         }
     }
 
-    pub fn insert(&mut self, word: String) {
+    pub fn insert(&mut self, name: &str, new_member: &'a T) {
         let mut current = &mut self.root;
 
-        for ch in word.chars() {
+        for ch in name.chars() {
             let index = Self::char_to_index(ch);
-            current = current.children[index].get_or_insert_with(|| Box::new(TrieNode::new()));
+            current = current.children[index].get_or_insert_with(|| Box::new(TrieNode::new(None)));
         }
 
-        current.is_end_of_word = true;
+        current.member = Some(new_member);
     }
 
-    pub fn search(&self, word: String) -> bool {
-        let mut current = &self.root;
+    pub fn search(&self, word: &str) -> Option<&'a T> {
+        match self.search_node(word) {
+            Some(node) => node.member,
+            None => None,
+        }
+    }
+
+    fn search_node(&self, word: &str) -> Option<&TrieNode<'a, T>> {
+        let mut node = &self.root;
 
         for ch in word.chars() {
             let index = Self::char_to_index(ch);
 
-            if let Some(child) = &current.children[index] {
-                current = child;
-            } else {
-                return false;
+            match &node.children[index] {
+                Some(child) => {
+                    node = child;
+                }
+                _ => return None,
             }
         }
 
-        current.is_end_of_word
+        Some(node)
     }
 
-    pub fn starts_with(&self, prefix: String) -> bool {
+    pub rec_search(&self, word &str) -> Vec<&'a T> {
+        let ret = Vec::new();
+
+        base_node = self.search_node(word);
+        match base_node {
+            
+        }
+    }
+
+    pub fn starts_with(&self, prefix: &str) -> bool {
         let mut current = &self.root;
 
         for ch in prefix.chars() {

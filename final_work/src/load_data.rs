@@ -45,7 +45,8 @@ pub struct Player {
 struct PlayerEntry(u32, String, String);
 
 pub fn load_ratings(base_path: PathBuf) -> OneToMany<u32, Rating> {
-    let path = base_path.join("minirating.csv");
+    // let path = base_path.join("minirating.csv");
+    let path = base_path.join("rating.csv");
 
     let mut ratings: OneToMany<u32, Rating> = OneToMany::new(10000);
     let rdr = Reader::from_path(path).unwrap();
