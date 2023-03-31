@@ -4,7 +4,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct OneToMany<K, V> {
+pub struct OneToMany<K: MyHash + std::cmp::PartialEq, V> {
     map: HashMap<K, Vec<V>>,
 }
 

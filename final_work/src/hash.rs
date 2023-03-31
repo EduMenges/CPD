@@ -3,14 +3,15 @@ pub trait MyHash {
 }
 
 impl MyHash for str {
+    // Using the djb2 hash function
     fn hash(&self) -> usize {
-        let mut hash: usize = 5381;
+        let mut hash: u64 = 5381;
 
-        for c in self.chars() {
-            hash = (hash << 5).wrapping_add(hash) ^ (c as usize);
+        for byte in self.bytes() {
+            hash = ((hash << 5) + hash) + u64::from(byte);
         }
 
-        hash
+        hash as usize
     }
 }
 
@@ -22,23 +23,17 @@ impl MyHash for String {
 }
 
 impl MyHash for u32 {
+    // Using the FNV-1a hash function
     fn hash(&self) -> usize {
-        const FNV_PRIME: u32 = 0x01000193;
         const FNV_OFFSET: u32 = 0x811c_9dc5;
+        const FNV_PRIME: u32 = 0x0100_0193;
 
         let mut hash: u32 = FNV_OFFSET;
 
-        hash ^= self & 0xff;
-        hash = hash.wrapping_mul(FNV_PRIME);
-
-        hash ^= (self >> 8) & 0xff;
-        hash = hash.wrapping_mul(FNV_PRIME);
-
-        hash ^= (self >> 16) & 0xff;
-        hash = hash.wrapping_mul(FNV_PRIME);
-
-        hash ^= self >> 24;
-        hash = hash.wrapping_mul(FNV_PRIME);
+        for byte in self.to_ne_bytes() {
+            hash = hash.wrapping_mul(FNV_PRIME);
+            hash ^= u32::from(byte);
+        }
 
         hash as usize
     }
