@@ -14,7 +14,9 @@ mod trie_tree;
 
 fn main() {
     let db = DataBase::new();
-    // db.print_ratings();
-    // db.print_tags();
-    db.print_players();
+    // db.query_player("Fer");
+    // db.query_user_players(118046);
+    // db.query_best_in_position(10, "ST");
+    let query = ["Brazil", "Dribler"];
+    db.query_tags(&query);
 }

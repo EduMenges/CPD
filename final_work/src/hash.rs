@@ -5,13 +5,13 @@ pub trait MyHash {
 impl MyHash for str {
     // Using the djb2 hash function
     fn hash(&self) -> usize {
-        let mut hash: u64 = 5381;
+        let mut hash: usize = 5381;
 
         for byte in self.bytes() {
-            hash = ((hash << 5) + hash) + u64::from(byte);
+            hash = ((hash << 5).wrapping_add(hash)).wrapping_add(byte as usize);
         }
 
-        hash as usize
+        hash
     }
 }
 

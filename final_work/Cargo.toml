@@ -7,6 +7,10 @@ edition = "2021"
 
 [dependencies]
 array-init = "2.1.0"
+clap = { version = "4.2.1", features = ["derive"] }
 csv = "1.2.0"
+itertools = "0.10.5"
+ordered-float = "3.6.0"
 rayon = "1.7.0"
 serde = { version = "1.0.158", features = ["derive"] }
+tabled = "0.10.0"
