@@ -21,10 +21,11 @@ where
     pub fn insert(&mut self, entry: (K, V)) {
         match self.get_mut(&entry.0) {
             Some(collection) => collection.push(entry.1),
-            None => self.map.insert((entry.0, vec![entry.1])),
+            None => self.map.unchkd_insert((entry.0, vec![entry.1])),
         }
     }
 
+    #[inline(always)]
     pub fn get(&self, key: &K) -> Option<&Vec<V>> {
         self.map.get(key)
     }

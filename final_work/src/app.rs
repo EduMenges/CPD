@@ -38,7 +38,6 @@ impl DataBase {
             players,
         }
     }
-
     pub fn print_ratings(&self) {
         for rating in self.ratings.iter().take(50) {
             println!("{:?}", rating);

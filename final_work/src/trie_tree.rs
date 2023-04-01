@@ -1,3 +1,5 @@
+use std::iter::Map;
+
 use array_init::array_init;
 
 /// This amount is enough to represent all [a-z][A-Z] letters.
@@ -30,18 +32,17 @@ pub struct Trie<'a, T> {
     root: TrieNode<'a, T>,
 }
 
-impl<'a, T> Trie<'a, T> {
+impl<'a, T: 'a> Trie<'a, T> {
     pub fn new() -> Self {
         Self {
             root: TrieNode::new(None),
         }
     }
 
-    pub fn insert(&mut self, name: &str, new_member: &'a T) {
+    pub fn insert(&mut self, word: &str, new_member: &'a T) {
         let mut current = &mut self.root;
 
-        for ch in name.chars() {
-            let index = Self::char_to_index(ch);
+        for index in Self::word_to_indexes(word) {
             current = current.children[index].get_or_insert_with(|| Box::new(TrieNode::new(None)));
         }
 
@@ -58,9 +59,7 @@ impl<'a, T> Trie<'a, T> {
     fn search_node(&self, word: &str) -> Option<&TrieNode<'a, T>> {
         let mut node = &self.root;
 
-        for ch in word.chars() {
-            let index = Self::char_to_index(ch);
-
+        for index in Self::word_to_indexes(word) {
             match &node.children[index] {
                 Some(child) => {
                     node = child;
@@ -83,25 +82,34 @@ impl<'a, T> Trie<'a, T> {
         ret
     }
 
-    pub fn starts_with(&self, prefix: &str) -> bool {
-        let mut current = &self.root;
-
-        for ch in prefix.chars() {
-            let index = Self::char_to_index(ch);
-
-            if let Some(child) = &current.children[index] {
-                current = child;
-            } else {
-                return false;
-            }
-        }
-
-        true
+    #[inline(always)]
+    fn char_to_index(ch: char) -> usize {
+        const STARTING_LETTER: usize = 'A' as usize;
+        ch as usize - STARTING_LETTER
     }
 
-    #[inline]
-    fn char_to_index(ch: char) -> usize {
-        const STARTING_LETTER: char = 'A';
-        ch as usize - STARTING_LETTER as usize
+    fn word_to_indexes(word: &str) -> impl Iterator<Item = usize> + '_ {
+        word.chars().map(|ch| Self::char_to_index(ch))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn all() {
+        let mut trie = Trie::new();
+        let bools = [true; 5];
+
+        trie.insert("abc", &bools[0]);
+        trie.insert("abcde", &bools[1]);
+        trie.insert("abde", &bools[2]);
+        trie.insert("b", &bools[3]);
+        trie.insert("a", &bools[4]);
+
+        assert!(*trie.search("abc").unwrap());
+        assert!(*trie.search("b").unwrap());
+        assert!(trie.search("xyz").is_none());
     }
 }

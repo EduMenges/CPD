@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use csv::Reader;
 
-use crate::{hash_map::HashMap, one_to_many::OneToMany};
+use crate::{hash_map::HashMap, one_to_many::OneToMany, trie_tree::Trie};
 
 #[derive(Debug)]
 pub struct Rating {
@@ -48,7 +48,7 @@ pub fn load_ratings(base_path: PathBuf) -> OneToMany<u32, Rating> {
     // let path = base_path.join("minirating.csv");
     let path = base_path.join("rating.csv");
 
-    let mut ratings: OneToMany<u32, Rating> = OneToMany::new(22000);
+    let mut ratings: OneToMany<u32, Rating> = OneToMany::new(25033);
     let rdr = Reader::from_path(path).unwrap();
 
     for entry in rdr
@@ -70,7 +70,7 @@ pub fn load_ratings(base_path: PathBuf) -> OneToMany<u32, Rating> {
 pub fn load_tags(base_path: PathBuf) -> OneToMany<String, u32> {
     let path = base_path.join("tags.csv");
 
-    let mut tags = OneToMany::new(200);
+    let mut tags = OneToMany::new(199);
     let rdr = Reader::from_path(path).unwrap();
 
     for entry in rdr.into_deserialize::<TagEntry>().map(|rec| rec.unwrap()) {
@@ -83,7 +83,7 @@ pub fn load_tags(base_path: PathBuf) -> OneToMany<String, u32> {
 pub fn load_players(base_path: PathBuf, ratings: &OneToMany<u32, Rating>) -> HashMap<u32, Player> {
     let path = base_path.join("players.csv");
 
-    let mut players = HashMap::new(7000);
+    let mut players = HashMap::new(5501);
     let rdr = Reader::from_path(path).unwrap();
 
     for entry in rdr
@@ -104,3 +104,8 @@ pub fn load_players(base_path: PathBuf, ratings: &OneToMany<u32, Rating>) -> Has
 
     players
 }
+
+// pub fn mount_trie(players: &HashMap<u32, Player>) -> Trie<&'a Player> {
+//     todo!();
+//     let trie = Trie::new();
+// }
