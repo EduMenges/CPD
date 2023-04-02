@@ -1,12 +1,13 @@
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use std::{
+    io::{stdin, stdout, Write},
     path::Path,
     time::{Duration, Instant},
 };
 use tabled::{builder::Builder, *};
 
-use crate::{hash_map::HashMap, load_data::*, one_to_many::OneToMany, trie_tree::Trie};
+use crate::{hash_map::HashMap, load_data::*, one_to_many::OneToMany, parser, trie_tree::Trie};
 
 pub struct DataBase {
     tags: OneToMany<String, u32>,
@@ -24,6 +25,15 @@ struct PlayerAndId<'a>(
 impl<'a> From<&'a (u32, Player)> for PlayerAndId<'a> {
     fn from(value: &'a (u32, Player)) -> Self {
         Self(value.0, &value.1)
+    }
+}
+
+impl OneToMany<String, u32> {
+    pub fn has_id(&self, key: &str, id: u32) -> bool {
+        match self.get(key) {
+            Some(ids) => ids.contains(&id),
+            None => false,
+        }
     }
 }
 
@@ -58,8 +68,37 @@ impl DataBase {
         }
     }
 
+    pub fn main_loop(&self) {
+        loop {
+            let mut input = String::new();
+
+            print!("> ");
+            let _ = stdout().flush();
+
+            match stdin().read_line(&mut input) {
+                Ok(_) => {
+                    match parser::parse(&input) {
+                        Some(action) => match action {
+                            parser::Actions::Player(name) => self.query_player(&name),
+                            parser::Actions::User(id) => self.query_user_players(id),
+                            parser::Actions::Top(max_amount, position) => {
+                                self.query_best_in_position(max_amount, &position)
+                            }
+                            parser::Actions::Tags(tags) => self.query_tags(&tags),
+                        },
+                        _ => println!("The input could not be parsed"),
+                    };
+                    println!();
+                }
+                Err(_) => {
+                    break;
+                }
+            }
+        }
+    }
+
     pub fn query_player(&self, prefix: &str) {
-        let mut table = self
+        let table = self
             .trie
             .search_all(prefix)
             .into_iter()
@@ -79,7 +118,7 @@ impl DataBase {
         );
 
         if let Some(ratings) = self.ratings.get(&user_id) {
-            let mut table = ratings
+            let table = ratings
                 .iter()
                 .map(|Rating { sofifa_id, rating }| {
                     let player = self.players.get(sofifa_id).unwrap();
@@ -90,13 +129,15 @@ impl DataBase {
                 .take(20)
                 .table();
             Self::draw_table(table);
+        } else {
+            println!("The user could not be found in the database");
         }
     }
 
     pub fn query_best_in_position(&self, max_amount: usize, position: &str) {
         const MIN_RATING_COUNT: u16 = 1000;
 
-        let mut table = self
+        let table = self
             .players
             .iter()
             .filter(|(_, player)| player.count > MIN_RATING_COUNT && player.has_position(position))
@@ -108,25 +149,22 @@ impl DataBase {
         Self::draw_table(table);
     }
 
-    pub fn query_tags(&self, tags: &[&str]) {
-        let mut table = self
+    pub fn query_tags<S: AsRef<str>>(&self, tags: &[S]) {
+        let table = self
             .players
             .iter()
-            .filter(|(id, _)| tags.iter().all(|tag| self.tag_has_player(tag, *id)))
+            .filter(|(id, _)| tags.iter().all(|tag| self.tags.has_id(tag.as_ref(), *id)))
             .map(|entry| PlayerAndId::from(entry))
             .table();
         Self::draw_table(table);
     }
 
-    fn tag_has_player(&self, tag: &str, id: u32) -> bool {
-        match self.tags.get(&String::from(tag)) {
-            Some(ids) => ids.contains(&id),
-            None => false,
-        }
-    }
-
     fn draw_table(mut table: Table) {
         let table = table.with(Style::modern());
-        println!("{table}");
+        if table.count_rows() == 1 {
+            println!("No results were found for this query.");
+        } else {
+            println!("{table}");
+        }
     }
 }

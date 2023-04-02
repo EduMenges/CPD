@@ -1,6 +1,7 @@
 use crate::hash::MyHash;
 use core::slice;
 use std::{
+    borrow::Borrow,
     collections::{linked_list, LinkedList},
     fmt::Display,
 };
@@ -17,13 +18,13 @@ pub struct ListStats {
 }
 
 #[derive(Debug)]
-pub struct HashMap<K: MyHash + std::cmp::PartialEq, V> {
+pub struct HashMap<K: MyHash + PartialEq, V> {
     table: Vec<Vec<(K, V)>>,
 }
 
 impl<K, V> HashMap<K, V>
 where
-    K: MyHash + std::cmp::PartialEq,
+    K: MyHash + PartialEq,
 {
     pub fn new(capacity: usize) -> Self {
         let mut table = Vec::with_capacity(capacity);
@@ -49,33 +50,49 @@ where
         }
     }
 
-    pub fn get(&self, key: &K) -> Option<&V> {
+    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
         let hashed = self.do_hash(key);
 
         self.table[hashed]
             .iter()
-            .find(|(k, _)| k == key)
+            .find(|(k, _)| k.borrow() == key)
             .map(|(_, v)| v)
     }
 
-    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
         let hashed = self.do_hash(key);
 
         self.table[hashed]
             .iter_mut()
-            .find(|(k, _)| k == key)
+            .find(|(k, _)| k.borrow() == key)
             .map(|(_, v)| v)
     }
 
     #[inline(always)]
-    fn do_hash(&self, key: &K) -> usize {
+    fn do_hash<Q: ?Sized>(&self, key: &Q) -> usize
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
         key.hash() % self.table.capacity()
     }
 
     #[inline]
-    pub fn contains(&self, key: &K) -> bool {
+    pub fn contains<Q: ?Sized>(&self, key: &Q) -> bool
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
         let hashed = self.do_hash(key);
-        self.table[hashed].iter().any(|(k, _)| k == key)
+        self.table[hashed].iter().any(|(k, _)| k.borrow() == key)
     }
 
     #[inline(always)]

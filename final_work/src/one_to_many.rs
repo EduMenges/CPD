@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use crate::{
     hash::MyHash,
     hash_map::{self, HashMap},
@@ -10,7 +12,7 @@ pub struct OneToMany<K: MyHash + std::cmp::PartialEq, V> {
 
 impl<K, V> OneToMany<K, V>
 where
-    K: MyHash + std::cmp::PartialEq,
+    K: MyHash + PartialEq,
 {
     pub fn new(entries: usize) -> Self {
         Self {
@@ -26,16 +28,28 @@ where
     }
 
     #[inline(always)]
-    pub fn get(&self, key: &K) -> Option<&Vec<V>> {
+    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&Vec<V>>
+    where
+        K: Borrow<Q>,
+        Q: PartialEq + MyHash,
+    {
         self.map.get(key)
     }
 
     #[inline(always)]
-    fn get_mut(&mut self, key: &K) -> Option<&mut Vec<V>> {
+    fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut Vec<V>>
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
         self.map.get_mut(key)
     }
 
-    pub fn update(&mut self, key: &K, value: V) {
+    pub fn update<Q: ?Sized>(&mut self, key: &Q, value: V)
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
         if let Some(vec) = self.get_mut(key) {
             vec.push(value)
         }
