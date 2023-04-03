@@ -3,9 +3,10 @@ use ordered_float::OrderedFloat;
 use std::{
     io::{stdin, stdout, Write},
     path::Path,
-    time::{Instant},
+    thread,
+    time::Instant,
 };
-use tabled::{*};
+use tabled::*;
 
 use crate::{hash_map::HashMap, load_data::*, one_to_many::OneToMany, parser, trie_tree::Trie};
 
@@ -45,11 +46,17 @@ impl DataBase {
 
         let start_time = Instant::now();
 
-        let ratings = load_ratings(base_path.into());
+        let ratings_handle = thread::spawn(|| load_ratings(base_path.into()));
+
+        let players_handle = thread::spawn(|| load_players(base_path.into()));
 
         let tags = load_tags(base_path.into());
 
-        let players = load_players(base_path.into(), &ratings);
+        let mut players = players_handle.join().unwrap();
+
+        let ratings = ratings_handle.join().unwrap();
+
+        ratings.compute_ratings(&mut players);
 
         let end_time = Instant::now();
 

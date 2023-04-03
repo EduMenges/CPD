@@ -20,6 +20,7 @@ where
         }
     }
 
+    #[inline]
     pub fn insert(&mut self, entry: (K, V)) {
         match self.get_mut(&entry.0) {
             Some(collection) => collection.push(entry.1),

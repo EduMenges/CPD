@@ -1,4 +1,4 @@
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
 use csv::Reader;
 use tabled::Tabled;
@@ -13,13 +13,9 @@ pub struct Rating {
 
 impl OneToMany<u32, Rating> {
     pub fn compute_ratings(&self, players: &mut HashMap<u32, Player>) {
-        for ratings in self.iter().map(|(_, user_ratings)| user_ratings) {
-            for Rating {
-                sofifa_id: fifa_id,
-                rating,
-            } in ratings
-            {
-                let player = players.get_mut(&fifa_id).unwrap();
+        for (_, ratings) in self.iter() {
+            for Rating { sofifa_id, rating } in ratings {
+                let player = players.get_mut(&sofifa_id).unwrap();
 
                 player.count += 1;
                 player.rating += *rating as f64;
@@ -92,7 +88,7 @@ pub fn load_tags(base_path: PathBuf) -> OneToMany<String, u32> {
 #[derive(serde::Deserialize)]
 struct PlayerEntry(u32, String, String);
 
-pub fn load_players(base_path: PathBuf, ratings: &OneToMany<u32, Rating>) -> HashMap<u32, Player> {
+pub fn load_players(base_path: PathBuf) -> HashMap<u32, Player> {
     let path = base_path.join("players.csv");
 
     let mut players = HashMap::new(5501);
@@ -111,8 +107,6 @@ pub fn load_players(base_path: PathBuf, ratings: &OneToMany<u32, Rating>) -> Has
         };
         players.insert((fifa_id, player));
     }
-
-    ratings.compute_ratings(&mut players);
 
     players
 }
