@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, ops::Deref, path::PathBuf};
+use std::{path::PathBuf};
 
 use csv::Reader;
 use tabled::Tabled;

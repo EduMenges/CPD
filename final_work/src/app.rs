@@ -3,9 +3,9 @@ use ordered_float::OrderedFloat;
 use std::{
     io::{stdin, stdout, Write},
     path::Path,
-    time::{Duration, Instant},
+    time::{Instant},
 };
-use tabled::{builder::Builder, *};
+use tabled::{*};
 
 use crate::{hash_map::HashMap, load_data::*, one_to_many::OneToMany, parser, trie_tree::Trie};
 

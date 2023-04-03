@@ -1,10 +1,7 @@
 use crate::hash::MyHash;
 use core::slice;
-use std::{
-    borrow::Borrow,
-    collections::{linked_list, LinkedList},
-    fmt::Display,
-};
+use rayon::prelude::*;
+use std::borrow::Borrow;
 
 #[derive(Debug)]
 pub struct ListStats {
@@ -50,6 +47,7 @@ where
         }
     }
 
+    #[inline]
     pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
@@ -63,6 +61,7 @@ where
             .map(|(_, v)| v)
     }
 
+    #[inline]
     pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,

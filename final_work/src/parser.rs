@@ -31,7 +31,7 @@ pub fn parse(input: &str) -> Option<Actions> {
             None
         }
     } else if let Some(captures) = TAGS_RE.captures(parts) {
-        let tags = Vec::from_iter({ captures[1].split("' '").map(|st| st.to_string()) });
+        let tags = Vec::from_iter(captures[1].split("' '").map(|st| st.to_string()));
         Some(Actions::Tags(tags))
     } else {
         None
