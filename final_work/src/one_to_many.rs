@@ -29,21 +29,21 @@ where
     }
 
     #[inline(always)]
-    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&Vec<V>>
+    pub fn get<Q: ?Sized>(&self, query: &Q) -> Option<&Vec<V>>
     where
         K: Borrow<Q>,
         Q: PartialEq + MyHash,
     {
-        self.map.get(key)
+        self.map.get(query)
     }
 
     #[inline(always)]
-    fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut Vec<V>>
+    fn get_mut<Q: ?Sized>(&mut self, query: &Q) -> Option<&mut Vec<V>>
     where
         K: Borrow<Q>,
         Q: MyHash + PartialEq,
     {
-        self.map.get_mut(key)
+        self.map.get_mut(query)
     }
 
     #[inline(always)]
@@ -52,8 +52,17 @@ where
             map_i: self.map.iter(),
         }
     }
-}
 
+    pub fn update<Q: ?Sized>(&mut self, query: &Q, val: V)
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
+        if let Some(bin) = self.get_mut(query) {
+            bin.push(val)
+        }
+    }
+}
 pub struct Iter<'a, K, V> {
     map_i: hash_map::Iter<'a, K, V>,
 }

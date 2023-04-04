@@ -59,9 +59,9 @@ impl DataBase {
 
         ratings.compute_ratings(&mut players);
 
-        let end_time = Instant::now();
-
         let trie = mount_trie(&players);
+
+        let end_time = Instant::now();
 
         println!(
             "The data was loaded. Total time: {:?}",
@@ -145,16 +145,18 @@ impl DataBase {
     pub fn query_best_in_position(&self, max_amount: usize, position: &str) {
         const MIN_RATING_COUNT: u16 = 1000;
 
-        let table = self
-            .players
-            .iter()
-            .filter(|(_, player)| player.count > MIN_RATING_COUNT && player.has_position(position))
-            .sorted_unstable_by_key(|(_, player)| OrderedFloat(player.rating))
-            .rev()
-            .take(max_amount)
-            .map(|(id, player)| PlayerAndId(*id, player))
-            .table();
-        Self::draw_table(table);
+        Self::draw_table(
+            self.players
+                .iter()
+                .filter(|(_, player)| {
+                    player.count > MIN_RATING_COUNT && player.has_position(position)
+                })
+                .sorted_unstable_by_key(|(_, player)| OrderedFloat(player.rating))
+                .rev()
+                .take(max_amount)
+                .map(|(id, player)| PlayerAndId(*id, player))
+                .table(),
+        );
     }
 
     pub fn query_tags<S: AsRef<str>>(&self, tags: &[S]) {
