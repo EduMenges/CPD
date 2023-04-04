@@ -46,16 +46,6 @@ where
         self.map.get_mut(key)
     }
 
-    pub fn update<Q: ?Sized>(&mut self, key: &Q, value: V)
-    where
-        K: Borrow<Q>,
-        Q: MyHash + PartialEq,
-    {
-        if let Some(vec) = self.get_mut(key) {
-            vec.push(value)
-        }
-    }
-
     #[inline(always)]
     pub fn iter(&self) -> Iter<'_, K, Vec<V>> {
         Iter {

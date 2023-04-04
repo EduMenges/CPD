@@ -1,11 +1,12 @@
-use itertools::Itertools;
-use ordered_float::OrderedFloat;
 use std::{
     io::{stdin, stdout, Write},
     path::Path,
     thread,
     time::Instant,
 };
+
+use itertools::Itertools;
+use ordered_float::OrderedFloat;
 use tabled::*;
 
 use crate::{hash_map::HashMap, load_data::*, one_to_many::OneToMany, parser, trie_tree::Trie};

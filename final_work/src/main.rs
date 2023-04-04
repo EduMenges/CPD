@@ -1,7 +1,6 @@
 #![feature(let_chains)]
 #![feature(exact_size_is_empty)]
-
-
+#![feature(core_intrinsics)]
 
 use app::DataBase;
 

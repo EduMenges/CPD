@@ -1,7 +1,7 @@
 use crate::hash::MyHash;
 use core::slice;
-use rayon::prelude::*;
 use std::borrow::Borrow;
+use std::intrinsics::likely;
 
 #[derive(Debug)]
 pub struct ListStats {
@@ -47,32 +47,37 @@ where
         }
     }
 
-    #[inline]
-    pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
+    #[inline(always)]
+    pub fn get<Q: ?Sized>(&self, query: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
         Q: MyHash + PartialEq,
     {
-        let hashed = self.do_hash(key);
-
-        self.table[hashed]
-            .iter()
-            .find(|(k, _)| k.borrow() == key)
-            .map(|(_, v)| v)
+        self.find(query).map(|(i, j)| &self.table[i][j].1)
     }
 
-    #[inline]
-    pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
+    #[inline(always)]
+    pub fn get_mut<Q: ?Sized>(&mut self, query: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,
         Q: MyHash + PartialEq,
     {
-        let hashed = self.do_hash(key);
+        self.find(query).map(|(i, j)| &mut self.table[i][j].1)
+    }
 
-        self.table[hashed]
-            .iter_mut()
-            .find(|(k, _)| k.borrow() == key)
-            .map(|(_, v)| v)
+    fn find<Q: ?Sized>(&self, query: &Q) -> Option<(usize, usize)>
+    where
+        K: Borrow<Q>,
+        Q: MyHash + PartialEq,
+    {
+        let hashed = self.do_hash(query);
+
+        for (i, (key, _)) in self.table[hashed].iter().enumerate() {
+            if likely(query == key.borrow()) {
+                return Some((hashed, i));
+            }
+        }
+        None
     }
 
     #[inline(always)]
@@ -85,13 +90,12 @@ where
     }
 
     #[inline]
-    pub fn contains<Q: ?Sized>(&self, key: &Q) -> bool
+    pub fn contains<Q: ?Sized>(&self, query: &Q) -> bool
     where
         K: Borrow<Q>,
         Q: MyHash + PartialEq,
     {
-        let hashed = self.do_hash(key);
-        self.table[hashed].iter().any(|(k, _)| k.borrow() == key)
+        self.find(query).is_some()
     }
 
     #[inline(always)]
