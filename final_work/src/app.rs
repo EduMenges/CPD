@@ -41,7 +41,7 @@ impl OneToMany<String, u32> {
 
 impl DataBase {
     pub fn new() -> Self {
-        let base_path = Path::new(r".\dados");
+        let base_path = Path::new(r"./dados");
 
         println!("Loading the data...");
 
@@ -93,6 +93,7 @@ impl DataBase {
                                 self.query_best_in_position(max_amount, &position)
                             }
                             parser::Actions::Tags(tags) => self.query_tags(&tags),
+                            parser::Actions::Quit => std::process::exit(0)
                         },
                         _ => println!("The input could not be parsed"),
                     };

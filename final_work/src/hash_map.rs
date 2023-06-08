@@ -3,6 +3,7 @@ use core::slice;
 use std::borrow::Borrow;
 use std::intrinsics::likely;
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct ListStats {
     used_rows: usize,

@@ -6,6 +6,7 @@ pub enum Actions {
     User(u32),
     Top(usize, String),
     Tags(Vec<String>),
+    Quit
 }
 
 const PLAYER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^player\s*(.+)$").unwrap());
@@ -33,7 +34,10 @@ pub fn parse(input: &str) -> Option<Actions> {
     } else if let Some(captures) = TAGS_RE.captures(parts) {
         let tags = Vec::from_iter(captures[1].split("' '").map(|st| st.to_string()));
         Some(Actions::Tags(tags))
-    } else {
+    } else if input.eq("q") {
+        Some(Actions::Quit)
+    }
+    else {
         None
     }
 }

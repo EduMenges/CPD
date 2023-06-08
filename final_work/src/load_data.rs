@@ -47,8 +47,8 @@ impl Player {
 struct RatingEntry(u32, u32, f32);
 
 pub fn load_ratings(base_path: PathBuf) -> OneToMany<u32, Rating> {
-    // let path = base_path.join("minirating.csv");
     let path = base_path.join("rating.csv");
+    println!("Loading the file at {:?}", path);
 
     let mut ratings: OneToMany<u32, Rating> = OneToMany::new(25033);
     let rdr = Reader::from_path(path).unwrap();
